@@ -78,7 +78,7 @@
             </body>
         </HTML>
     </xsl:template>
-    <xsl:template match="cts:request"/>
+    <xsl:template match="cts:request"/> 
     <xsl:template match="cts:CTSError">
         <h1>CTS Error</h1>
         <p class="error">

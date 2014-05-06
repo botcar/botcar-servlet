@@ -3,6 +3,11 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <!-- This stylesheet includes templates for handling all TEI elements used in CHS diplomatic editions. -->
     
+    <!-- Kill tei/text/body. We don't need them -->
+    <xsl:template match="tei:TEI"><xsl:apply-templates/></xsl:template>
+    <xsl:template match="tei:text"><xsl:apply-templates/></xsl:template>
+    <xsl:template match="tei:body"><xsl:apply-templates/></xsl:template>
+    
     <xsl:template match="tei:add">
         <span class="tei_add">
             <xsl:apply-templates/>

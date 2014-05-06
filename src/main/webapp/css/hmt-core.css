@@ -50,43 +50,49 @@ table {
 /*  Structure  */
 body {
   font-family: Times, serif;
-  font-size: 12pt;
   font-weight: 300;
+  line-height: 1.8;
   padding: 0.5em;
-  background-color: #fff;
-  padding: 2em; }
+  color: #676767;
+  background-color: white;
+  /* padding: $default-whitespace * 4; */ }
+
+article, nav {
+  padding: 0 0 0 1em; }
 
 header, footer {
   font-family: Helvetica, sans-serif;
   font-weight: 300;
-  color: maroon;
+  color: #270b47;
   margin: 0.5em 0 0.5em 0;
-  color: #aaaaaa;
+  color: #888888;
   font-size: 75%;
   margin: 1em 0 1em 0;
-  clear: both; }
+  padding: 1em;
+  clear: both;
+  background-color: white; }
 
 header {
-  border-bottom: 1px solid #aaaaaa;
+  border-bottom: 1px solid #888888;
   padding-bottom: 0.5em; }
 
 footer {
-  border-top: 1px solid #aaaaaa;
+  border-bottom: 1px solid #888888;
   padding-top: 0.5em; }
 
 nav, .nav {
   font-family: Helvetica, sans-serif;
   font-weight: 300;
-  color: maroon;
+  color: #270b47;
   margin: 0.5em 0 0.5em 0;
   border: none; }
   nav ul, .nav ul {
     list-style: none;
-    margin-left: 0; }
+    margin-left: 1em; }
     nav ul li, .nav ul li {
       display: inline;
       padding: 0 0.5em 0 0.5em;
-      border-left: 1px solid maroon;
+      border-left: 1px solid #270b47;
       margin: 0; }
     nav ul li:nth-child(1), .nav ul li:nth-child(1) {
       border-left: none;
@@ -96,7 +102,7 @@ nav, .nav {
 h1, h2, h3 {
   font-family: Helvetica, sans-serif;
   font-weight: 300;
-  color: maroon;
+  color: #270b47;
   margin: 0.5em 0 0.5em 0;
   margin: 1em 0 0.5em 0;
   font-weight: 200;
@@ -125,7 +131,7 @@ li {
 
 blockquote {
   margin: 0.5em 0 0.5em 1.5em;
-  border: 1px dashed #c3c3c3;
+  border: 1px dashed #a2a2a2;
   padding: 0.5em; }
 
 /* Spans */
@@ -136,11 +142,11 @@ strong {
   font-weight: 900; }
 
 a {
-  color: #0000b3;
+  color: #421f6d;
   text-decoration: none; }
 
 a:hover {
-  border-bottom: 1px solid #aaaaaa; }
+  border-bottom: 1px solid #888888; }
 
 code {
   font-family: Courier, fixed;

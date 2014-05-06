@@ -1,10 +1,13 @@
 
 @namespace xml "http://example.com/q-markup";
+@namespace tei "http://www.tei-c.org/ns/1.0";
 
 /* This should be limited to TEI namespace 
 and needs to be completely replaced when corresponding
 XSLT tagging of class value is done.
 */
+
+
 
 ab {
     display : block;

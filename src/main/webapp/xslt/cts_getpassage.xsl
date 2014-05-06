@@ -15,7 +15,7 @@
 		<!-- can some of the reply contents in xsl variables
 			for convenient use in different parts of the output -->
 		<xsl:variable name="urnString">
-			<xsl:value-of select="//cts:request/cts:urn"/>
+			<xsl:value-of select="//cts:reply/cts:urn"/>
 		</xsl:variable>
 		
 		
@@ -90,25 +90,30 @@
 								select="cts:CTSError"/>
 						</xsl:when>
 						<xsl:otherwise>
-							<h1><xsl:value-of
+						    
+							<h3><xsl:value-of
 							    select="//cts:reply/cts:label/cts:groupname"/>, <em>
 											<xsl:value-of
 											    select="//cts:reply/cts:label/cts:title"/>
-										</em> (<xsl:value-of
-										    select="//cts:reply/cts:label/cts:version"/>):
+							    </em></h3>
+						    <p><xsl:value-of
+										    select="//cts:reply/cts:label/cts:version"/>:
 								<xsl:call-template name="urnPsg">
 									<xsl:with-param name="urnStr">
 										<xsl:value-of select="$urnString"/>
 									</xsl:with-param>
 								</xsl:call-template>
+						    </p>
+						    <p><xsl:value-of select="$urnString"/></p>
 								
-									</h1>
 									
-									<p><xsl:value-of select="$urnString"/></p>
+									
+									
 								
 							
 							<xsl:apply-templates
 								select="//cts:reply"/>
+						    
 						</xsl:otherwise>
 					</xsl:choose>
 					
@@ -120,15 +125,16 @@
 		</html>
 	</xsl:template>
 	<!-- End Framework for main body document -->
+    
+    
 	<!-- Match elements of the CTS reply -->
 	<xsl:template match="cts:reply">
-		<!--<xsl:if test="(@xml:lang = 'grc') or (@xml:lang = 'lat')">
-			<div class="chs-alphaios-hint">Because this page has Greek or Latin text on it, it can take advantage of the morphological and lexical tools from the <a href="http://alpheios.net/" target="blank">Apheios Project</a>.</div>
-		</xsl:if>-->
+		
 		<xsl:element name="div">
-			<xsl:attribute name="lang">
-				<xsl:value-of select="@xml:lang"/>
+			<xsl:attribute name="xml:lang">
+				<xsl:value-of select="cts:passage/@xml:lang"/>
 			</xsl:attribute>
+		    <xsl:attribute name="class">cts_reply_div</xsl:attribute>
 			
 			<!-- This is where we will catch TEI markup -->
 			<xsl:apply-templates/>
