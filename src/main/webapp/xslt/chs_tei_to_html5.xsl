@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:tei="http://www.tei-c.org/ns/1.0"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:cts="http://chs.harvard.edu/xmlns/cts">
     <!-- This stylesheet includes templates for handling all TEI elements used in CHS diplomatic editions. -->
     
     <!-- Kill tei/text/body. We don't need them -->
     <xsl:template match="tei:TEI"><xsl:apply-templates/></xsl:template>
     <xsl:template match="tei:text"><xsl:apply-templates/></xsl:template>
     <xsl:template match="tei:body"><xsl:apply-templates/></xsl:template>
+    
+    <xsl:template match="cts:node">
+        <xsl:element name="span">
+            <xsl:attribute name="class">cts-node</xsl:attribute>
+            <xsl:attribute name="data-ctsurn"><xsl:value-of select="@urn"/></xsl:attribute>
+            <xsl:apply-templates/>
+        </xsl:element>
+    </xsl:template>
     
     <xsl:template match="tei:add">
         <span class="tei_add">
@@ -30,11 +39,16 @@
     
     <xsl:template match="tei:said">
         
-        
-        <xsl:apply-templates/>
-        <xsl:if test="not(../preceding-sibling::*[1]/tei:said/@who = @who)">
+        <xsl:choose>
+            <xsl:when test="(not(../preceding-sibling::*[1]/tei:said/@who = @who)) and (not(../../preceding-sibling::*[1]/*/tei:said/@who = @who))">
             <span class="tei_said_who"><xsl:value-of select="@who"/></span>
-        </xsl:if>
+        </xsl:when>
+            <xsl:otherwise>
+                <span class="tei_said_who"> </span>
+            </xsl:otherwise>
+        </xsl:choose>
+        <xsl:apply-templates/>
+        
     </xsl:template>
     
     <xsl:template match="tei:choice">
@@ -253,8 +267,8 @@
                 </xsl:otherwise>
             </xsl:choose>
             <!-- Toggle comments between the two following lines -->
-            <xsl:call-template name="replaceSupplied"/>
-            <!-- <xsl:apply-templates/> -->
+            <!--<xsl:call-template name="replaceSupplied"/>-->
+             <xsl:apply-templates/> 
         </xsl:element>
     </xsl:template>
     <xsl:template match="tei:sp">
@@ -267,6 +281,10 @@
             <xsl:apply-templates/>
         </p>
     </xsl:template>
+    
+  
+    
+    
     <xsl:template match="tei:unclear">
         <xsl:element name="span">
             <xsl:attribute name="class">tei_unclear</xsl:attribute>

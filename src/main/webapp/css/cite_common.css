@@ -61,14 +61,10 @@ Handle TEI elements (constructed by getPassage.xsl)
 	margin-bottom: 0em;
 }
 
-span.tei_said_who:before {
-		content: ":";
-		margin-left: 1em;
-}
 
 span.tei_said_who {
-		color: #maroon;
-		float: right;
+	   display: inline-block;
+	   width: 8em;
 }
 
 span.tei_w {
@@ -134,6 +130,26 @@ span.tei_add:after {
 	/* float: right; */
 }
 
+.citation_value > .citation_value{
+	font-size: 100%;
+	font-weight: bolder;
+}
+
+.citation_value {
+	font-size: 120%;
+	font-weight: bolder;
+}
+
+
+.citation_value .citation_value .citation_value{
+	font-size: 100%;
+	font-weight: bold;
+}
+
+.citation_value .citation_value .citation_value .citation_value{
+	font-size: 100%;
+	font-weight: normal;
+}
 
 .tei_section {
 	display: block;
@@ -161,10 +177,24 @@ span.tei_add:after {
 	color: grey;
 }
 
-.tei_suppliedText {
+.tei_supplied {
 	color: #69C;
 }
 
+
+.tei_supplied:before {
+	content: '[';
+}
+.tei_supplied:after {
+	content: ']';
+}
+
+.tei_gap:before {
+	content: '[';
+}
+.tei_gap:after {
+	content: ']';
+}
 
 .tei_sic {
 	color: red;
@@ -323,3 +353,34 @@ div.citeimagecaption {
 }
 
 
+/* Testing tooltip-style display of CTS URNs on hover */
+
+.cts-node {
+		display: inline;
+		position: relative;
+}
+
+.cts-node:hover:after{
+		background: #333;
+		background: rgba(0,0,0,.6);
+		border-radius: 5px;
+		bottom: 8px;
+		color: #fff;
+		content: attr(data-ctsurn);
+		left: 600px;
+
+		padding: 5px 15px;
+		position: absolute;
+		z-index: 98;
+		width: 320px;
+}
+.cts-node:hover:before{
+		border: solid;
+		border-color: transparent rgba(0,0,0,.6);
+		border-width: 6px 6px 6px 0px;
+		bottom: 6px;
+		content: "";
+		left: 594px;
+		position: absolute;
+		z-index: 99;
+}

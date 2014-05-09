@@ -4,7 +4,7 @@
 	<xsl:output omit-xml-declaration="yes" method="html" encoding="UTF-8"/>
     <xsl:include href="header.xsl"/>
     <xsl:include href="chs_tei_to_html5.xsl"/>
-	<xsl:include href="alternates.xsl"/>
+	
     
     <xsl:variable name="homeUrl">@homeUrl@</xsl:variable>
     <xsl:variable name="formsUrl">@queryforms@</xsl:variable>
@@ -30,10 +30,11 @@
 					title="CSS for CTS"
 					type="text/css"/>
 			    <link
-			        href="css/citekit_special.css"
+			        href="css/cite_common.css"
 			        rel="stylesheet"
 			        title="CSS for CTS"
 			        type="text/css"/>
+			    <link rel="stylesheet" href="css/cite_common.css"></link>
 			<link
 						href="@coreCss@"
 					rel="stylesheet"
