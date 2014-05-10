@@ -84,8 +84,8 @@ dependencies {
   compile group : "edu.holycross.shot", name : "sparqlimg", version : sparqlimgVersion
   runtime group : "edu.holycross.shot", name : "sparqlimg", version : sparqlimgVersion
 
-  compile group : "edu.holycross.shot", name : "sparqlcts", version : sparqlctsVersion
-  runtime group : "edu.holycross.shot", name : "sparqlcts", version : sparqlctsVersion
+  compile group : "edu.holycross.shot", name : "sparqlcts-test", version : sparqlctsVersion
+  runtime group : "edu.holycross.shot", name : "sparqlcts-test", version : sparqlctsVersion
 
   compile group : "edu.holycross.shot", name : "sparqlcc", version : sparqlccVersion
   runtime group : "edu.holycross.shot", name : "sparqlcc", version : sparqlccVersion
