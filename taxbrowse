@@ -1,0 +1,261 @@
+import groovyx.net.http.*
+import groovyx.net.http.HttpResponseException
+import static groovyx.net.http.ContentType.*
+import static groovyx.net.http.Method.*
+
+import edu.harvard.chs.cite.CtsUrn
+
+String contentType = "text/html"
+response.setContentType(contentType)
+response.setCharacterEncoding('UTF-8')
+response.setHeader( "Access-Control-Allow-Origin", "*")
+
+boolean done = false
+
+//def slurper = new groovy.json.JsonSlurper()
+
+String urnStr = request.getParameter("famUrn")
+
+
+String sparql = "@sparqls@"
+String prefix = "prefix cts:        <http://www.homermultitext.org/cts/rdf/> prefix dse:        <http://www.homermultitext.org/dse/rdf/> prefix cite:        <http://www.homermultitext.org/cite/rdf/> prefix hmt:        <http://www.homermultitext.org/hmt/rdf/> prefix citedata:        <http://www.homermultitext.org/hmt/citedata/> prefix dcterms: <http://purl.org/dc/terms/> prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> prefix  xsd: <http://www.w3.org/2001/XMLSchema#> prefix olo:     <http://purl.org/ontology/olo/core#> prefix lex:        <http://data.perseus.org/rdfverbs/> prefix pal: <http://shot.holycrossedu/rdfverbs/pal/> prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> prefix latepig: <http://shot.holycross.edu/rdf/latepig/> prefix chron: <http://shot.holycross.edu/chron/rdf/> prefix owl:        <http://www.w3.org/2002/07/owl#> prefix fuSyntax: <http://folio.furman.edu/datans/fuSyntax/> prefix bctaxon: <http://folio.furman.edu/datans/bctaxon/> prefix fys: <http://folio.furman.edu/datans/fys/> "
+
+
+/**
+ * Given an image urn, returns an "<img src=..." string for a thumbnail
+ * @param imgurn
+ * @returns html img-element, as a String.
+ */
+
+String imgThumbLink(imgURN){
+    String imgSvc = "@images@"
+    String defaultThumbWidth = "50"
+    String urlString = ""
+    String returnString = ""
+    String newWidth = defaultThumbWidth
+
+    //Make thumbnail
+    if ( imgURN.tokenize("@").size() == 2){
+        String roiString = imgURN.tokenize("@")[1].tokenize(",")[3]
+        roiWidth = roiString.toFloat()
+        newWidth = Math.floor(newWidth.toInteger().div(roiWidth)).toInteger().toString()
+    }
+    urlString = "<a href='${imgSvc}?request=GetIIPMooViewer&urn=${imgURN}'><img src='${imgSvc}?request=GetBinaryImage&w="
+    urlString += "${newWidth}&urn=${imgURN}'/></a>"
+
+    returnString = "${urlString}<br/>[ <a href='${imgSvc}?request=GetImagePlus&urn=${imgURN}'>image data</a> ]"
+
+
+    return returnString
+}
+
+
+/**
+ * Submits an encoded query to the configured SPARQL endpoint,
+ * and returns the reply.
+ * @param acceptType MIME type to specify for reply.
+ * @param query SPARQL query to submit.
+ * @returns SPARQL reply, as a String.
+ */
+String getSparqlReply(String acceptType, String query) {
+        String replyString
+                def encodedQuery = URLEncoder.encode(query)
+                def q = "@sparqls@query?query=${encodedQuery}"
+                if (acceptType == "application/json") {
+                        q +="&output=json"
+                }
+
+        def http = new HTTPBuilder(q)
+                http.request( Method.GET, ContentType.TEXT ) { req ->
+                        headers.Accept = acceptType
+                                response.success = { resp, reader ->
+                                        replyString = reader.text
+                                }
+                }
+        return replyString
+}
+
+/** Formulates a Sparql query to return familes and associated genera
+
+ * @param urn URN of the CTS-urn to be illustrated.
+ * @param prefix SPARQL prefix statements to prepend to the query.
+ * @returns A valid SPARQL query.
+ */
+String listFamilesAndGenera(String prefix) {
+
+        String reply = """
+${prefix}
+select ?famURN ?famName ?genusURN ?specURN ?genusName ?specimenURN ?specimenLabel ?img where {
+ 
+    
+     ?famURN cite:belongsTo <urn:cite:botcar:family> .
+     ?famURN citedata:family_familyName ?famName . 
+      ?genusURN bctaxon:childOf ?famURN . 
+          ?specURN bctaxon:childOf ?genusURN . 
+          ?genusURN citedata:genus_genusName ?genusName .
+          ?specimenURN bctaxon:exampleOf ?specURN .
+          ?specimenURN rdf:label ?specimenLabel .
+          optional {
+                ?img dse:illustrates ?specimenURN .
+          }
+}
+
+order by ?famURN ?genusURN ?specimenLabel
+"""
+                return reply
+}
+
+String listFamilies(String prefix) {
+
+        String reply = """
+${prefix}
+select ?famURN ?famName  where {
+     ?famURN cite:belongsTo <urn:cite:botcar:family> .
+     ?famURN citedata:family_familyName ?famName .
+}
+order by ?famURN 
+"""
+                return reply
+}
+
+String listGenera(String fURN, String prefix) {
+
+        String reply = """
+${prefix}
+select ?genusURN ?genusName  where {
+     ?genusURN bctaxon:childOf <${fURN}> .   
+     ?genusURN citedata:genus_genusName ?genusName .
+
+}
+order by ?genusURN 
+"""
+                return reply
+}
+
+String listSpecimens(String gURN, String prefix) {
+
+        String reply = """
+${prefix}
+select ?specimenURN ?specimenLabel where {
+     ?specURN bctaxon:childOf <${gURN}> .
+     ?specimenURN bctaxon:exampleOf ?specURN .
+     ?specimenURN rdf:label ?specimenLabel .
+         }
+order by ?specimenURN 
+"""
+                return reply
+}
+
+String listImages(String sURN, String prefix) {
+
+        String reply = """
+${prefix}
+select ?img  where {
+     ?img dse:illustrates <${sURN}> .
+     }
+     
+"""
+                return reply
+}
+
+
+String makeTree(String prefix){
+    def slurper = new groovy.json.JsonSlurper()
+    String htmlString = "<ul>\r"
+    String queryString = listFamilies(prefix)
+    fList = slurper.parseText(getSparqlReply("application/json", queryString))
+    fList.results.bindings.each{ b ->
+        htmlString += "<li class='family' tabindex='0'>${b.famName.value} <span class='code'>[ ${b.famURN.value} ]</span>\r<ul>\r"  
+        //get genera
+        queryString = listGenera(b.famURN.value, prefix)  
+        gList = slurper.parseText(getSparqlReply("application/json", queryString))
+        gList.results.bindings.each{ g -> 
+           htmlString += "<li  >${g.genusName.value} <span class='code'>[ ${g.genusURN.value} ]</span>\r<ul>\r"
+            //get specimens
+                queryString = listSpecimens(g.genusURN.value, prefix)  
+                sList = slurper.parseText(getSparqlReply("application/json", queryString))
+                sList.results.bindings.each{ s -> 
+                    htmlString += "<li class='specimen'>${s.specimenLabel.value} <span class='code'>[ ${s.specimenURN.value} ]<span>\r<ul>\r"
+                    //get images
+                         queryString = listImages(s.specimenURN.value, prefix)
+                         iList = slurper.parseText(getSparqlReply("application/json", queryString))
+                         iList.results.bindings.each{ i ->
+                             htmlString += "<li class='imgThumb'>" 
+                             htmlString += imgThumbLink(i.img.value)
+                             htmlString += "</li>\r"
+                         }
+                    htmlString += "</ul>\r</li>\r"
+                }
+           htmlString += "</ul>\r</li>\r"
+        }
+        htmlString += "</ul>\r</li>\r"
+    }
+    htmlString += "</ul>\r" 
+    return htmlString
+}
+
+
+if (!done){
+
+String queryString;
+//queryString = listFamilesAndGenera(prefix);
+//taxList = slurper.parseText(getSparqlReply("application/json", queryString))
+
+String taxTree = makeTree(prefix) 
+
+
+html.html {
+        head {
+                title("@projectlabel@: Scholia Reader")
+                        link(type : "text/css", rel : "stylesheet", href : "css/browsers.css", title : "CSS stylesheet")
+                        link(type : "text/css", rel : "stylesheet", href : "css/bc-special.css", title : "CSS stylesheet")
+                        link(type : "text/css", rel : "stylesheet", href : "@coreCss@", title : "CSS stylesheet")
+                        script(type: "text/javascript", src : "js/jquery.min.js", "  ")
+                        script(type: "text/javascript", src : "js/botcartree.js", "  ")
+                        script(type: "text/javascript", src : "@citekit@", "  ")
+        }
+
+        body {
+
+                header {
+
+		  nav {
+		    mkp.yield "@projectlabel@: "
+		    
+		    a(href : '@homeUrl@', "Home")
+		  }
+		  h2("@projectlabel@: Taxonomic View by Family")
+                }
+
+                article {
+
+
+    //h2("${taxList.results.bindings.size()} entities represented in the data")
+
+    p { 
+        mkp.yield "This page represents the current state of data: specimens indexed to images and according to taxonomy. The contents of this page will expand as we add to the data. Click on a family to see available specimens. You can also use the "
+        code("tab")
+        mkp.yield " key."
+            }
+p(id: "toggler"){
+            mkp.yield "Show Everything."
+        }
+
+
+    println(taxTree)
+
+        // citekit magic:
+        ul (id: "citekit-sources") {
+                li (class : "citekit-source cite-text citekit-default", id : "defaulttext", "@texts@") 
+                li (class : "citekit-source cite-image citekit-default", id : "defaultimage", "data-image-w" : "300",  "@images@" )
+                li (class : "citekit-source cite-collection citekit-default", id : "defaultcollection", "@collections@" )
+        }
+
+
+}
+                footer("@htmlfooter@")
+        }
+}
+}
+
+

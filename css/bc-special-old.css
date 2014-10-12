@@ -1,0 +1,31 @@
+/*
+.specimen  ul { display: none; }
+.specimen:focus  ul { display: block;}
+.family .specimen:focus { display: block; }
+.family:focus > ul { display: block;}
+*/
+
+
+.family > ul { display: none; }
+
+#toggler {
+    color: navy;
+}
+
+#toggler:hover {
+    background: #ddd;
+}
+
+li { 
+    margin: 0.1 em; 
+}
+
+li.specimen { clear: both }
+
+li.imgThumb { 
+        font-size: 85%;
+}
+
+.citeimagecaption p, .code {
+    font-size: 75%;
+}
